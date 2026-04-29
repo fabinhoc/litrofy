@@ -25,7 +25,7 @@
 // Dialog backdrop + card
 .glass-dialog {
   .q-card {
-    background: rgba(10, 7, 22, 0.92) !important;
+    background: var(--glass-dialog-bg) !important;
     backdrop-filter: blur(var(--glass-blur-medium));
     -webkit-backdrop-filter: blur(var(--glass-blur-medium));
     border: var(--glass-border) !important;
@@ -45,16 +45,16 @@
 // Inputs
 .glass-input {
   .q-field__control {
-    background: rgba(255, 255, 255, 0.06) !important;
+    background: var(--glass-input-bg) !important;
     border-radius: var(--glass-border-radius-xs) !important;
 
     &::before {
-      border-color: rgba(255, 255, 255, 0.12) !important;
+      border-color: var(--glass-input-border) !important;
       border-radius: var(--glass-border-radius-xs) !important;
     }
 
     &:hover::before {
-      border-color: rgba(255, 255, 255, 0.22) !important;
+      border-color: var(--glass-input-border-hover) !important;
     }
   }
 
@@ -78,7 +78,7 @@
 
 // Context menus
 .glass-menu {
-  background: rgba(10, 7, 22, 0.96) !important;
+  background: var(--glass-menu-bg) !important;
   backdrop-filter: blur(var(--glass-blur-medium));
   -webkit-backdrop-filter: blur(var(--glass-blur-medium));
   border: var(--glass-border) !important;
@@ -96,7 +96,7 @@
   transition: background 0.15s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.08) !important;
+    background: var(--glass-item-hover-bg) !important;
   }
 
   .q-item__label {
@@ -106,11 +106,15 @@
 
 // Global q-menu (select dropdowns)
 .q-menu {
-  background: rgba(10, 7, 22, 0.96) !important;
+  background: var(--glass-menu-bg) !important;
   backdrop-filter: blur(var(--glass-blur-medium));
   -webkit-backdrop-filter: blur(var(--glass-blur-medium));
   border: var(--glass-border) !important;
   border-radius: var(--glass-border-radius-sm) !important;
+
+  .q-item {
+    color: var(--glass-text-primary);
+  }
 
   .q-item--active {
     color: var(--color-purple-light) !important;
@@ -120,11 +124,18 @@
 // Loading skeleton
 .vehicle-card-skeleton {
   border-radius: 24px !important;
-  background: rgba(255, 255, 255, 0.05) !important;
+  background: var(--glass-skeleton-bg) !important;
 }
 
 @media (max-width: 600px) {
   .glass-title {
     font-size: 1.5rem;
+  }
+}
+
+// Light mode icon color override (icon uses color="white" Quasar prop)
+body.light-mode {
+  .metric-icon-wrap .q-icon {
+    color: var(--color-purple) !important;
   }
 }

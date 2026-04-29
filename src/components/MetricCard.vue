@@ -60,7 +60,7 @@ withDefaults(
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.14);
+  background: var(--glass-icon-wrap-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -72,27 +72,27 @@ withDefaults(
   font-weight: 600;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--glass-text-secondary);
 }
 
 .metric-value {
   font-size: 36px;
   font-weight: 300;
   letter-spacing: -0.04em;
-  color: rgba(255, 255, 255, 0.95);
+  color: var(--glass-text-primary);
   line-height: 1;
 }
 
 .metric-unit {
   font-size: 13px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--glass-text-muted);
   padding-bottom: 5px;
 }
 
 .metric-sublabel {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.38);
+  color: var(--glass-text-muted);
   letter-spacing: 0.02em;
 }
 
@@ -105,14 +105,14 @@ withDefaults(
 .metric-progress-track {
   width: 100%;
   height: 3px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--glass-progress-track);
   border-radius: 999px;
   overflow: hidden;
 }
 
 .metric-progress-fill {
   height: 100%;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--glass-progress-fill);
   border-radius: 999px;
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }

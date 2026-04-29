@@ -73,14 +73,14 @@ withDefaults(
 
 /* Secondary — translucent glass */
 .glass-button--secondary {
-  background: rgba(255, 255, 255, 0.08) !important;
+  background: var(--glass-btn-secondary-bg) !important;
   color: var(--glass-text-primary) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid var(--glass-card-border) !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
 }
 
 .glass-button--secondary:hover {
-  background: rgba(255, 255, 255, 0.13) !important;
+  background: var(--glass-btn-secondary-bg-hover) !important;
   transform: translateY(-1px);
 }
 
@@ -110,7 +110,7 @@ withDefaults(
 }
 
 .glass-button--ghost:hover {
-  background: rgba(255, 255, 255, 0.07) !important;
+  background: var(--glass-btn-ghost-hover-bg) !important;
   color: var(--glass-text-primary) !important;
   transform: none;
 }

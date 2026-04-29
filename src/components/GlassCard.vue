@@ -18,8 +18,8 @@ withDefaults(
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-top-color: rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--glass-card-border);
+  border-top-color: var(--glass-card-border-top);
   box-shadow: var(--glass-shadow-card);
   transition:
     transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
@@ -33,11 +33,7 @@ withDefaults(
 }
 
 .glass-card--default {
-  background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.1) 0%,
-    rgba(255, 255, 255, 0.05) 100%
-  );
+  background: var(--glass-card-bg);
 }
 
 .glass-card--purple {

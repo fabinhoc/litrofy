@@ -317,7 +317,7 @@ const deleteSupply = async (supply: FuelSupply) => {
 .supply-main {
   font-size: 13px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--glass-text-primary);
 }
 
 .supply-fuel {
@@ -325,26 +325,26 @@ const deleteSupply = async (supply: FuelSupply) => {
 }
 
 .supply-sep {
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--glass-text-muted);
   margin: 0 2px;
 }
 
 .supply-consumption {
   font-size: 12px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--glass-text-secondary);
   display: flex;
   align-items: center;
 }
 
 .supply-consumption--first {
   font-style: italic;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--glass-text-muted);
 }
 
 .supply-meta {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--glass-text-muted);
 }
 
 /* Empty state */

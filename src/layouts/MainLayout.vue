@@ -14,6 +14,14 @@
           <span class="brand-name">Litrofy</span>
         </div>
         <q-space />
+        <q-btn
+          flat
+          round
+          dense
+          :icon="isDark ? 'light_mode' : 'dark_mode'"
+          class="theme-toggle"
+          @click="toggleTheme"
+        />
       </q-toolbar>
     </q-header>
 
@@ -23,7 +31,23 @@
   </q-layout>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+
+const isDark = ref(true);
+
+onMounted(() => {
+  const saved = localStorage.getItem('litrofy-theme');
+  isDark.value = saved !== 'light';
+  document.body.classList.toggle('light-mode', !isDark.value);
+});
+
+const toggleTheme = () => {
+  isDark.value = !isDark.value;
+  localStorage.setItem('litrofy-theme', isDark.value ? 'dark' : 'light');
+  document.body.classList.toggle('light-mode', !isDark.value);
+};
+</script>
 
 <style scoped>
 .glass-layout {
@@ -47,7 +71,7 @@
   left: -20%;
   width: 75vw;
   height: 75vw;
-  background: radial-gradient(circle at center, rgba(124, 58, 237, 0.22) 0%, transparent 65%);
+  background: var(--orb-purple);
   animation: drift 16s ease-in-out infinite alternate;
 }
 
@@ -56,7 +80,7 @@
   right: -20%;
   width: 65vw;
   height: 65vw;
-  background: radial-gradient(circle at center, rgba(99, 102, 241, 0.18) 0%, transparent 65%);
+  background: var(--orb-indigo);
   animation: drift 20s ease-in-out infinite alternate-reverse;
 }
 
@@ -65,7 +89,7 @@
   left: 20%;
   width: 45vw;
   height: 45vw;
-  background: radial-gradient(circle at center, rgba(13, 148, 136, 0.1) 0%, transparent 65%);
+  background: var(--orb-teal);
   animation: drift 24s ease-in-out infinite alternate;
   animation-delay: -8s;
 }
@@ -81,10 +105,10 @@
 
 /* Header */
 .glass-header {
-  background: rgba(7, 5, 15, 0.65) !important;
+  background: var(--glass-header-bg) !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+  border-bottom: 1px solid var(--glass-header-border) !important;
   box-shadow: none !important;
   position: relative;
   z-index: 10;
@@ -110,7 +134,16 @@
   font-size: 16px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--glass-header-text);
+}
+
+.theme-toggle {
+  color: var(--glass-header-text) !important;
+  opacity: 0.75;
+
+  &:hover {
+    opacity: 1;
+  }
 }
 
 .page-container {
