@@ -1,1 +1,130 @@
-// app global css
+// Global glassmorphism styles
+
+.glass-page {
+  background: transparent;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+.glass-title {
+  color: var(--glass-text-primary);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  text-shadow: var(--glass-text-shadow);
+}
+
+.glass-text {
+  color: var(--glass-text-secondary);
+}
+
+.glass-muted {
+  color: var(--glass-text-muted);
+}
+
+// Dialog backdrop + card
+.glass-dialog {
+  .q-card {
+    background: rgba(10, 7, 22, 0.92) !important;
+    backdrop-filter: blur(var(--glass-blur-medium));
+    -webkit-backdrop-filter: blur(var(--glass-blur-medium));
+    border: var(--glass-border) !important;
+    border-top: var(--glass-border-highlight) !important;
+    border-radius: var(--glass-border-radius) !important;
+    box-shadow: var(--glass-shadow) !important;
+    color: var(--glass-text-primary);
+  }
+}
+
+.glass-dialog-title {
+  color: var(--glass-text-primary);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+// Inputs
+.glass-input {
+  .q-field__control {
+    background: rgba(255, 255, 255, 0.06) !important;
+    border-radius: var(--glass-border-radius-xs) !important;
+
+    &::before {
+      border-color: rgba(255, 255, 255, 0.12) !important;
+      border-radius: var(--glass-border-radius-xs) !important;
+    }
+
+    &:hover::before {
+      border-color: rgba(255, 255, 255, 0.22) !important;
+    }
+  }
+
+  &.q-field--focused .q-field__control::before {
+    border-color: var(--color-purple) !important;
+  }
+
+  .q-field__label {
+    color: var(--glass-text-secondary) !important;
+  }
+
+  .q-field__native,
+  .q-field__input {
+    color: var(--glass-text-primary) !important;
+  }
+
+  .q-select__dropdown-icon {
+    color: var(--glass-text-secondary) !important;
+  }
+}
+
+// Context menus
+.glass-menu {
+  background: rgba(10, 7, 22, 0.96) !important;
+  backdrop-filter: blur(var(--glass-blur-medium));
+  -webkit-backdrop-filter: blur(var(--glass-blur-medium));
+  border: var(--glass-border) !important;
+  border-radius: var(--glass-border-radius-sm) !important;
+  box-shadow: var(--glass-shadow) !important;
+}
+
+.glass-list {
+  background: transparent !important;
+}
+
+.glass-menu-item {
+  border-radius: 8px;
+  margin: 2px 4px;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+  }
+
+  .q-item__label {
+    color: var(--glass-text-primary) !important;
+  }
+}
+
+// Global q-menu (select dropdowns)
+.q-menu {
+  background: rgba(10, 7, 22, 0.96) !important;
+  backdrop-filter: blur(var(--glass-blur-medium));
+  -webkit-backdrop-filter: blur(var(--glass-blur-medium));
+  border: var(--glass-border) !important;
+  border-radius: var(--glass-border-radius-sm) !important;
+
+  .q-item--active {
+    color: var(--color-purple-light) !important;
+  }
+}
+
+// Loading skeleton
+.vehicle-card-skeleton {
+  border-radius: 24px !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+@media (max-width: 600px) {
+  .glass-title {
+    font-size: 1.5rem;
+  }
+}

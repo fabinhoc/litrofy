@@ -1,25 +1,90 @@
 // Quasar Sass (& SCSS) Variables
-// --------------------------------------------------
-// To customize the look and feel of this app, you can override
-// the Sass/SCSS variables found in Quasar's source Sass/SCSS files.
 
-// Check documentation for full list of Quasar variables
+$primary: #7c3aed;
+$secondary: #a78bfa;
+$accent: #0d9488;
 
-// Your own variables (that are declared here) and Quasar's own
-// ones will be available out of the box in your .vue/.scss/.sass files
+$dark: #0f0a1e;
+$dark-page: #07050f;
 
-// It's highly recommended to change the default colors
-// to match your app's branding.
-// Tip: Use the "Theme Builder" on Quasar's documentation website.
+$positive: #10b981;
+$negative: #ef4444;
+$info: #6366f1;
+$warning: #f59e0b;
 
-$primary   : #1976D2;
-$secondary : #26A69A;
-$accent    : #9C27B0;
+:root {
+  // Glass backgrounds
+  --glass-bg-primary: rgba(255, 255, 255, 0.07);
+  --glass-bg-secondary: rgba(255, 255, 255, 0.04);
+  --glass-bg-dark: rgba(7, 5, 15, 0.85);
 
-$dark      : #1D1D1D;
-$dark-page : #121212;
+  // Blur
+  --glass-blur-light: 12px;
+  --glass-blur-medium: 24px;
+  --glass-blur-heavy: 48px;
 
-$positive  : #21BA45;
-$negative  : #C10015;
-$info      : #31CCEC;
-$warning   : #F2C037;
+  // Borders
+  --glass-border: 1px solid rgba(255, 255, 255, 0.12);
+  --glass-border-highlight: 1px solid rgba(255, 255, 255, 0.22);
+  --glass-border-radius: 24px;
+  --glass-border-radius-sm: 16px;
+  --glass-border-radius-xs: 12px;
+  --glass-border-radius-pill: 999px;
+
+  // Shadows
+  --glass-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.12),
+    0 8px 24px rgba(0, 0, 0, 0.2),
+    0 24px 48px rgba(0, 0, 0, 0.25);
+  --glass-shadow-hover:
+    0 4px 8px rgba(0, 0, 0, 0.15),
+    0 16px 32px rgba(0, 0, 0, 0.3),
+    0 32px 64px rgba(0, 0, 0, 0.35);
+  --glass-shadow-card:
+    0 2px 8px rgba(0, 0, 0, 0.15),
+    0 12px 32px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+
+  // Text
+  --glass-text-primary: rgba(255, 255, 255, 0.95);
+  --glass-text-secondary: rgba(255, 255, 255, 0.58);
+  --glass-text-muted: rgba(255, 255, 255, 0.35);
+  --glass-text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+
+  // Brand palette
+  --color-purple: #7c3aed;
+  --color-purple-light: #a78bfa;
+  --color-indigo: #6366f1;
+  --color-teal: #0d9488;
+  --color-teal-light: #2dd4bf;
+  --color-pink: #db2777;
+  --color-pink-light: #f472b6;
+  --color-blue: #2563eb;
+  --color-amber: #d97706;
+
+  // Gradients (solid)
+  --gradient-purple: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
+  --gradient-teal: linear-gradient(135deg, #0d9488 0%, #0ea5e9 100%);
+  --gradient-pink: linear-gradient(135deg, #db2777 0%, #7c3aed 100%);
+  --gradient-amber: linear-gradient(135deg, #d97706 0%, #ea580c 100%);
+
+  // Gradients (glass — semi-transparent for overlay effect)
+  --gradient-glass-purple: linear-gradient(
+    145deg,
+    rgba(124, 58, 237, 0.5) 0%,
+    rgba(99, 102, 241, 0.28) 100%
+  );
+  --gradient-glass-teal: linear-gradient(
+    145deg,
+    rgba(13, 148, 136, 0.5) 0%,
+    rgba(14, 165, 233, 0.28) 100%
+  );
+  --gradient-glass-pink: linear-gradient(
+    145deg,
+    rgba(219, 39, 119, 0.5) 0%,
+    rgba(124, 58, 237, 0.28) 100%
+  );
+
+  // Page background
+  --glass-page-bg: #07050f;
+}
