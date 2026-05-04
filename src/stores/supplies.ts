@@ -18,8 +18,13 @@ export interface SupplyWithConsumption extends FuelSupply {
 }
 
 export const useSuppliesStore = defineStore('supplies', {
-  state: () => ({
-    supplies: [] as SupplyWithConsumption[],
+  state: (): {
+    supplies: SupplyWithConsumption[];
+    vehicleLastConsumptions: Record<number, number | undefined>;
+    loading: boolean;
+  } => ({
+    supplies: [],
+    vehicleLastConsumptions: {},
     loading: false,
   }),
 
@@ -31,7 +36,7 @@ export const useSuppliesStore = defineStore('supplies', {
           .from('fuel_supplies')
           .select('*')
           .eq('vehicle_id', vehicleId)
-          .order('mileage', { ascending: true });
+          .order('mileage', { ascending: false });
 
         if (error) throw error;
         this.supplies = this.calculateConsumptions(data || []);
@@ -44,7 +49,7 @@ export const useSuppliesStore = defineStore('supplies', {
 
     calculateConsumptions(supplies: FuelSupply[]): SupplyWithConsumption[] {
       const sorted = [...supplies].sort((a, b) => a.mileage - b.mileage);
-      return sorted.map((supply, index) => {
+      const withConsumption = sorted.map((supply, index) => {
         if (index === 0) {
           return { ...supply, consumption: undefined };
         }
@@ -56,6 +61,7 @@ export const useSuppliesStore = defineStore('supplies', {
         const consumption = kmDiff / supply.qtd;
         return { ...supply, consumption };
       });
+      return withConsumption.reverse();
     },
 
     async createSupply(supply: Omit<FuelSupply, 'id' | 'created_at' | 'updated_at'>) {
@@ -68,15 +74,14 @@ export const useSuppliesStore = defineStore('supplies', {
 
         if (error) throw error;
 
-        // Update vehicle mileage
-        await supabase
-          .from('vehicles')
-          .update({ mileage: supply.mileage })
-          .eq('id', supply.vehicle_id);
-
-        // Recalculate consumptions
         this.supplies.push(data);
         this.supplies = this.calculateConsumptions(this.supplies);
+
+        const maxMileage = this.supplies[0]?.mileage ?? supply.mileage;
+        await supabase
+          .from('vehicles')
+          .update({ mileage: maxMileage })
+          .eq('id', supply.vehicle_id);
 
         return data;
       } catch (error) {
@@ -96,19 +101,18 @@ export const useSuppliesStore = defineStore('supplies', {
 
         if (error) throw error;
 
-        // Update vehicle mileage if mileage changed
-        if (updates.mileage) {
-          await supabase
-            .from('vehicles')
-            .update({ mileage: updates.mileage })
-            .eq('id', data.vehicle_id);
-        }
-
-        // Recalculate consumptions
         const index = this.supplies.findIndex((s) => s.id === id);
         if (index !== -1) {
           this.supplies[index] = data;
           this.supplies = this.calculateConsumptions(this.supplies);
+        }
+
+        if (updates.mileage) {
+          const maxMileage = this.supplies[0]?.mileage ?? updates.mileage;
+          await supabase
+            .from('vehicles')
+            .update({ mileage: maxMileage })
+            .eq('id', data.vehicle_id);
         }
 
         return data;
@@ -128,7 +132,7 @@ export const useSuppliesStore = defineStore('supplies', {
         // Update vehicle mileage to previous supply or 0
         if (supply) {
           const remaining = this.supplies.filter((s) => s.id !== id);
-          const lastSupply = remaining[remaining.length - 1];
+          const lastSupply = remaining[0];
           await supabase
             .from('vehicles')
             .update({ mileage: lastSupply?.mileage || 0 })
@@ -150,14 +154,52 @@ export const useSuppliesStore = defineStore('supplies', {
       return consumptions.reduce((sum, c) => sum + c, 0) / consumptions.length;
     },
 
+    async fetchLastConsumptions(vehicleIds: number[]) {
+      if (vehicleIds.length === 0) return;
+      try {
+        const { data, error } = await supabase
+          .from('fuel_supplies')
+          .select('vehicle_id, mileage, qtd')
+          .in('vehicle_id', vehicleIds)
+          .order('vehicle_id')
+          .order('mileage', { ascending: false });
+
+        if (error) throw error;
+
+        const grouped: Record<number, { mileage: number; qtd: number }[]> = {};
+        for (const row of data ?? []) {
+          if (!grouped[row.vehicle_id]) grouped[row.vehicle_id] = [];
+          grouped[row.vehicle_id]!.push({ mileage: row.mileage, qtd: row.qtd });
+        }
+
+        const result: Record<number, number | undefined> = {};
+        for (const id of vehicleIds) {
+          const rows = grouped[id];
+          if (!rows || rows.length < 2) {
+            result[id] = undefined;
+          } else {
+            const last = rows[0]!;
+            const prev = rows[1]!;
+            const kmDiff = last.mileage - prev.mileage;
+            result[id] = kmDiff > 0 && last.qtd > 0 ? kmDiff / last.qtd : undefined;
+          }
+        }
+        this.vehicleLastConsumptions = result;
+      } catch (error) {
+        console.error('Error fetching last consumptions:', error);
+      }
+    },
+
     getTotalConsumption(): number | undefined {
       const supplies = this.supplies;
       if (supplies.length < 2) return undefined;
 
-      const first = supplies[0]!;
-      const last = supplies[supplies.length - 1]!;
+      const first = supplies[supplies.length - 1]!;
+      const last = supplies[0]!;
       const totalKm = last.mileage - first.mileage;
-      const totalLiters = supplies.reduce((sum, s) => sum + s.qtd, 0);
+      const totalLiters = supplies
+        .filter((s) => s.consumption !== undefined)
+        .reduce((sum, s) => sum + s.qtd, 0);
 
       if (totalLiters === 0) return undefined;
       return totalKm / totalLiters;

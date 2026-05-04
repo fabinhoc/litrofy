@@ -7,10 +7,11 @@
 
     <q-header class="glass-header" elevated>
       <q-toolbar class="glass-toolbar q-px-md">
-        <div class="toolbar-brand row items-center q-gutter-x-sm cursor-pointer" @click="$router.push('/')">
-          <div class="brand-icon">
-            <q-icon name="local_gas_station" size="16px" color="white" />
-          </div>
+        <div
+          class="toolbar-brand row items-center q-gutter-x-sm cursor-pointer"
+          @click="$router.push('/')"
+        >
+          <q-img src="/assets/logo.png" width="18px" height="18px" />
           <span class="brand-name">Litrofy</span>
         </div>
         <q-space />

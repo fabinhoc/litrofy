@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import { useVehiclesStore, type Vehicle } from 'stores/vehicles';
+import { useSuppliesStore } from 'stores/supplies';
 import { Notify } from 'quasar';
 import GlassCard from 'components/GlassCard.vue';
 import GlassButton from 'components/GlassButton.vue';
 
 const vehiclesStore = useVehiclesStore();
+const suppliesStore = useSuppliesStore();
 
 const cardVariants = ['purple', 'teal', 'pink'] as const;
 
 onMounted(async () => {
   await vehiclesStore.fetchVehicles();
+  const ids = vehiclesStore.vehicles.map((v) => v.id).filter((id): id is number => id !== undefined);
+  await suppliesStore.fetchLastConsumptions(ids);
 });
 
 const deleteVehicle = async (vehicle: Vehicle) => {
@@ -86,7 +90,11 @@ const deleteVehicle = async (vehicle: Vehicle) => {
             >
               <q-menu class="glass-menu">
                 <q-list class="glass-list">
-                  <q-item clickable @click.stop="$router.push(`/vehicle/${vehicle.id}/edit`)" class="glass-menu-item">
+                  <q-item
+                    clickable
+                    @click.stop="$router.push(`/vehicle/${vehicle.id}/edit`)"
+                    class="glass-menu-item"
+                  >
                     <q-item-section avatar>
                       <q-icon name="edit" color="white" />
                     </q-item-section>
@@ -118,6 +126,11 @@ const deleteVehicle = async (vehicle: Vehicle) => {
             <div class="vehicle-stat row items-center q-gutter-x-xs">
               <q-icon name="speed" size="14px" style="opacity: 0.65" />
               <span>{{ vehicle.mileage.toLocaleString('pt-BR') }} km</span>
+              <template v-if="suppliesStore.vehicleLastConsumptions[vehicle.id!] !== undefined">
+                <span style="opacity: 0.4">·</span>
+                <q-icon name="local_gas_station" size="13px" style="opacity: 0.65" />
+                <span>{{ suppliesStore.vehicleLastConsumptions[vehicle.id!]!.toFixed(1) }} km/L</span>
+              </template>
             </div>
             <q-icon name="arrow_forward" size="16px" style="opacity: 0.4" />
           </div>
@@ -138,7 +151,12 @@ const deleteVehicle = async (vehicle: Vehicle) => {
       </div>
 
       <!-- Add vehicle button -->
-      <glass-button class="add-btn" icon="add" variant="secondary" @click="$router.push('/vehicle/new')">
+      <glass-button
+        class="add-btn"
+        icon="add"
+        variant="secondary"
+        @click="$router.push('/vehicle/new')"
+      >
         Adicionar Veículo
       </glass-button>
     </div>

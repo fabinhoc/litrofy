@@ -23,6 +23,11 @@
                 <q-icon name="speed" size="13px" style="opacity: 0.6" />
                 <span>{{ vehicle?.mileage?.toLocaleString('pt-BR') }} km</span>
                 <span v-if="vehicle?.year_model" class="hero-year">· {{ vehicle.year_model }}</span>
+                <template v-if="suppliesStore.supplies[0]?.consumption">
+                  <span class="hero-year">·</span>
+                  <q-icon name="local_gas_station" size="13px" style="opacity: 0.6" />
+                  <span>{{ suppliesStore.supplies[0].consumption.toFixed(1) }} km/L</span>
+                </template>
               </div>
             </div>
             <q-icon name="directions_car" size="52px" class="hero-bg-icon" />
@@ -43,6 +48,7 @@
             unit="km/L"
             sublabel="por abastecimento"
             icon="local_gas_station"
+            tip="Média das eficiências por abastecimento: km rodados desde o anterior ÷ litros abastecidos. Cada trecho tem peso igual."
             :progress="
               suppliesStore.getAverageConsumption()
                 ? Math.min(suppliesStore.getAverageConsumption()! * 10, 100)
@@ -57,6 +63,7 @@
             unit="km/L"
             sublabel="desde o início"
             icon="analytics"
+            tip="Total de km rodados ÷ total de litros abastecidos (excluindo o primeiro). Representa o consumo real acumulado do veículo."
             :progress="
               suppliesStore.getTotalConsumption()
                 ? Math.min(suppliesStore.getTotalConsumption()! * 10, 100)
@@ -93,15 +100,30 @@
                   <span class="supply-sep">·</span>
                   <span class="supply-fuel">{{ supply.fuel }}</span>
                 </div>
-                <q-btn flat round dense icon="more_vert" size="xs" color="white" style="opacity: 0.55" @click.stop>
+                <q-btn
+                  flat
+                  round
+                  dense
+                  icon="more_vert"
+                  size="xs"
+                  color="white"
+                  style="opacity: 0.55"
+                  @click.stop
+                >
                   <q-menu class="glass-menu">
                     <q-list class="glass-list">
-                      <q-item clickable @click.stop="$router.push(`/vehicle/${vehicleId}/supply/${supply.id}/edit`)" class="glass-menu-item">
+                      <q-item
+                        clickable
+                        @click.stop="$router.push(`/vehicle/${vehicleId}/supply/${supply.id}/edit`)"
+                        class="glass-menu-item"
+                      >
                         <q-item-section avatar><q-icon name="edit" color="white" /></q-item-section>
                         <q-item-section><q-item-label>Editar</q-item-label></q-item-section>
                       </q-item>
                       <q-item clickable @click.stop="deleteSupply(supply)" class="glass-menu-item">
-                        <q-item-section avatar><q-icon name="delete" color="negative" /></q-item-section>
+                        <q-item-section avatar
+                          ><q-icon name="delete" color="negative"
+                        /></q-item-section>
                         <q-item-section><q-item-label>Excluir</q-item-label></q-item-section>
                       </q-item>
                     </q-list>
@@ -110,14 +132,21 @@
               </div>
 
               <div class="row items-center justify-between">
-                <div class="supply-consumption" :class="{ 'supply-consumption--first': !supply.consumption }">
+                <div
+                  class="supply-consumption"
+                  :class="{ 'supply-consumption--first': !supply.consumption }"
+                >
                   <q-icon
                     v-if="supply.consumption"
                     name="trending_up"
                     size="12px"
                     class="q-mr-xs"
                   />
-                  {{ supply.consumption ? `${supply.consumption.toFixed(1)} km/L` : 'Primeiro abastecimento' }}
+                  {{
+                    supply.consumption
+                      ? `${supply.consumption.toFixed(1)} km/L`
+                      : 'Primeiro abastecimento'
+                  }}
                 </div>
                 <div class="supply-meta">
                   <span v-if="supply.total">R$ {{ supply.total }}</span>
@@ -158,9 +187,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
-import { useVehiclesStore, type Vehicle } from 'stores/vehicles';
+import { useVehiclesStore } from 'stores/vehicles';
 import { useSuppliesStore, type FuelSupply } from 'stores/supplies';
 import { Notify } from 'quasar';
 import GlassCard from 'components/GlassCard.vue';
@@ -172,12 +201,15 @@ const vehiclesStore = useVehiclesStore();
 const suppliesStore = useSuppliesStore();
 
 const vehicleId = computed(() => parseInt(route.params['id'] as string));
-const vehicle = ref<Vehicle | null>(null);
+const vehicle = computed(() => vehiclesStore.vehicles.find((v) => v.id === vehicleId.value) ?? null);
 
 onMounted(async () => {
   if (vehicleId.value) {
-    vehicle.value = vehiclesStore.vehicles.find((v) => v.id === vehicleId.value) ?? null;
+    if (vehiclesStore.vehicles.length === 0) {
+      await vehiclesStore.fetchVehicles();
+    }
     await suppliesStore.fetchSupplies(vehicleId.value);
+    await vehiclesStore.fetchVehicles();
   }
 });
 

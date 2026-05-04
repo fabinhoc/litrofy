@@ -6,6 +6,14 @@
           <q-icon :name="icon" size="16px" color="white" />
         </div>
         <div class="metric-label">{{ label }}</div>
+        <q-icon
+          v-if="tip"
+          name="info_outline"
+          size="13px"
+          class="metric-tip-icon q-ml-xs"
+        >
+          <q-tooltip max-width="220px" class="metric-tooltip">{{ tip }}</q-tooltip>
+        </q-icon>
       </div>
 
       <div class="metric-value-row row items-end q-mb-sm">
@@ -40,6 +48,7 @@ withDefaults(
     icon?: string;
     progress?: number;
     variant?: 'default' | 'purple' | 'teal' | 'pink';
+    tip?: string;
   }>(),
   {
     unit: '',
@@ -88,6 +97,23 @@ withDefaults(
   font-weight: 500;
   color: var(--glass-text-muted);
   padding-bottom: 5px;
+}
+
+.metric-tip-icon {
+  color: var(--glass-text-muted);
+  opacity: 0.6;
+  cursor: default;
+  flex-shrink: 0;
+}
+
+.metric-tooltip {
+  font-size: 12px;
+  line-height: 1.5;
+  background: rgba(30, 20, 60, 0.95);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: 8px;
+  padding: 8px 10px;
 }
 
 .metric-sublabel {
