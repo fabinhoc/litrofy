@@ -29,11 +29,34 @@
     <q-page-container class="page-container">
       <router-view />
     </q-page-container>
+
+    <!-- PWA install banner -->
+    <Transition name="install-banner">
+      <div v-if="showInstallBanner" class="install-banner">
+        <div class="install-banner-inner row items-center no-wrap q-pa-md q-gutter-x-md">
+          <q-img src="/icons/icon-96x96.png" width="40px" height="40px" class="install-icon" />
+          <div class="col">
+            <div class="install-title">Instalar Litrofy</div>
+            <div class="install-sub">Acesse offline, como um app nativo</div>
+          </div>
+          <q-btn
+            unelevated
+            rounded
+            color="primary"
+            label="Instalar"
+            size="sm"
+            class="q-px-md"
+            @click="promptInstall"
+          />
+          <q-btn flat round dense icon="close" size="sm" class="install-close" @click="dismissInstall" />
+        </div>
+      </div>
+    </Transition>
   </q-layout>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 
 const isDark = ref(true);
 
@@ -47,6 +70,58 @@ const toggleTheme = () => {
   isDark.value = !isDark.value;
   localStorage.setItem('litrofy-theme', isDark.value ? 'dark' : 'light');
   document.body.classList.toggle('light-mode', !isDark.value);
+};
+
+// PWA install prompt
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  readonly userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
+const showInstallBanner = ref(false);
+let deferredPrompt: BeforeInstallPromptEvent | null = null;
+
+const onBeforeInstallPrompt = (e: Event) => {
+  e.preventDefault();
+  deferredPrompt = e as BeforeInstallPromptEvent;
+  // Não mostrar se o usuário já dispensou antes
+  if (localStorage.getItem('litrofy-install-dismissed') !== 'true') {
+    showInstallBanner.value = true;
+  }
+};
+
+const onAppInstalled = () => {
+  showInstallBanner.value = false;
+  deferredPrompt = null;
+};
+
+onMounted(() => {
+  // Não mostrar banner se já está rodando como PWA instalado
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+  if (isStandalone) return;
+
+  window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt);
+  window.addEventListener('appinstalled', onAppInstalled);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt);
+  window.removeEventListener('appinstalled', onAppInstalled);
+});
+
+const promptInstall = async () => {
+  if (!deferredPrompt) return;
+  await deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if (outcome === 'accepted') {
+    showInstallBanner.value = false;
+  }
+  deferredPrompt = null;
+};
+
+const dismissInstall = () => {
+  showInstallBanner.value = false;
+  localStorage.setItem('litrofy-install-dismissed', 'true');
 };
 </script>
 
@@ -151,5 +226,59 @@ const toggleTheme = () => {
   background: transparent !important;
   position: relative;
   z-index: 1;
+}
+
+/* PWA install banner */
+.install-banner {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 9999;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.install-banner-inner {
+  background: rgba(30, 20, 60, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(124, 58, 237, 0.35);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255,255,255,0.05);
+}
+
+.install-icon {
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.install-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  line-height: 1.2;
+}
+
+.install-sub {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 2px;
+}
+
+.install-close {
+  color: rgba(255, 255, 255, 0.4) !important;
+  flex-shrink: 0;
+}
+
+.install-banner-enter-active,
+.install-banner-leave-active {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.install-banner-enter-from,
+.install-banner-leave-to {
+  opacity: 0;
+  transform: translateY(24px) scale(0.96);
 }
 </style>
