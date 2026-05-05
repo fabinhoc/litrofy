@@ -5,6 +5,7 @@ import { useVehiclesStore } from 'stores/vehicles';
 import { Notify } from 'quasar';
 import GlassCard from 'components/GlassCard.vue';
 import GlassButton from 'components/GlassButton.vue';
+import CurrencyInput from 'components/CurrencyInput.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -90,14 +91,23 @@ const save = async () => {
             outlined
             class="glass-input"
           />
-          <q-input
-            v-model.number="form.mileage"
+          <q-field
             label="Quilometragem Atual *"
-            type="number"
-            required
             outlined
+            stack-label
             class="glass-input"
-          />
+            :model-value="form.mileage || undefined"
+            :rules="[(val) => !!val || 'Quilometragem deve ser maior ou igual a 0']"
+          >
+            <template #control>
+              <currency-input
+                v-model="form.mileage"
+                prefix=""
+                :precision="0"
+                class="q-field__input"
+              />
+            </template>
+          </q-field>
 
           <div class="row q-gutter-sm q-pt-sm">
             <glass-button variant="ghost" @click="$router.push('/')">Cancelar</glass-button>
