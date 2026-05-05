@@ -84,13 +84,19 @@ consumo_total = (km_final - km_inicial) / soma_litros
 src/
 ├── boot/           # Inicialização (Supabase)
 ├── components/     # Componentes reutilizáveis
+│   ├── CurrencyInput.vue   # Wrapper v-money3: moeda/números formatados (BRL por padrão)
+│   ├── GlassButton.vue     # Botão com design glassmorphism
+│   ├── GlassCard.vue       # Card com design glassmorphism
+│   └── MetricCard.vue      # Card de métricas
 ├── pages/          # Páginas da aplicação
-│   ├── IndexPage.vue     # Lista de veículos
-│   └── VehiclePage.vue   # Detalhes do veículo + abastecimentos
+│   ├── IndexPage.vue       # Lista de veículos
+│   ├── VehiclePage.vue     # Detalhes do veículo + abastecimentos
+│   ├── VehicleFormPage.vue # Formulário criar/editar veículo
+│   └── SupplyFormPage.vue  # Formulário criar/editar abastecimento
 ├── router/         # Configuração de rotas
 ├── stores/         # Estado Pinia
-│   ├── vehicles.ts       # Store de veículos
-│   └── supplies.ts       # Store de abastecimentos
+│   ├── vehicles.ts         # Store de veículos
+│   └── supplies.ts         # Store de abastecimentos
 └── layouts/        # Layouts da aplicação
 ```
 
@@ -131,7 +137,7 @@ VITE_SUPABASE_PUBLISHABLE_KEY=sua-chave-publica
 ```
 
 ### Quasar Config (quasar.config.ts)
-- Plugins: Notify
+- Plugins: Notify, Dialog
 - Boot: supabase
 - DevServer: open=true
 
@@ -142,8 +148,10 @@ VITE_SUPABASE_PUBLISHABLE_KEY=sua-chave-publica
 - @supabase/supabase-js: ^2.105.0
 - pinia: ^3.0.4
 - quasar: ^2.19.3
+- v-money3: ^3.24.1 (inputs de moeda/números formatados)
 - vue: ^3.5.33
 - vue-router: ^5.0.6
+- vue-the-mask: ^0.11.1 (máscaras fixas)
 
 ### Desenvolvimento
 - @quasar/app-vite: ^2.6.0
@@ -204,6 +212,19 @@ VITE_SUPABASE_PUBLISHABLE_KEY=sua-chave-publica
 **Sintoma**: Erros de filesystem read-only
 **Solução**: Usar pnpm ou configurar nodeLinker: node-modules no .yarnrc.yaml
 
+### 6. ERR_PNPM_UNEXPECTED_STORE ao instalar pacotes
+**Sintoma**: "The store used for the last installation is different"
+**Solução**: `pnpm config set store-dir /home/fabio-cruz/.local/share/pnpm/store/v10`
+
+### 7. Loop reativo em campos de cálculo cruzado
+**Sintoma**: Ao digitar no campo "Total", o valor é corrompido (ex: "250" vira "500")
+**Causa**: `@update:model-value` em campo A → calcula campo B → Money3Component re-emite → recalcula campo A
+**Solução**: Usar `@blur` ao invés de `@update:model-value` para gatilhos de cálculo cruzado
+
+### 8. Confirmação de exclusão sem botões visíveis com Notify
+**Sintoma**: Botão de ação não aparece ou fica invisível contra o fundo colorido do Notify
+**Solução**: Usar `Dialog` plugin do Quasar para confirmações (não `Notify.create` com `actions`)
+
 ## 📋 Checklist MVP
 
 - [x] Estrutura do banco de dados
@@ -257,6 +278,6 @@ pnpm run test
 
 ---
 
-**Última atualização**: Abril 2026
+**Última atualização**: Maio 2026
 **Versão**: 0.0.1
 **Status**: MVP Completo

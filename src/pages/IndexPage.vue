@@ -2,7 +2,7 @@
 import { onMounted } from 'vue';
 import { useVehiclesStore, type Vehicle } from 'stores/vehicles';
 import { useSuppliesStore } from 'stores/supplies';
-import { Notify } from 'quasar';
+import { Notify, Dialog } from 'quasar';
 import GlassCard from 'components/GlassCard.vue';
 import GlassButton from 'components/GlassButton.vue';
 
@@ -13,33 +13,30 @@ const cardVariants = ['purple', 'teal', 'pink'] as const;
 
 onMounted(async () => {
   await vehiclesStore.fetchVehicles();
-  const ids = vehiclesStore.vehicles.map((v) => v.id).filter((id): id is number => id !== undefined);
+  const ids = vehiclesStore.vehicles
+    .map((v) => v.id)
+    .filter((id): id is number => id !== undefined);
   await suppliesStore.fetchLastConsumptions(ids);
 });
 
-const deleteVehicle = async (vehicle: Vehicle) => {
+const deleteVehicle = (vehicle: Vehicle) => {
   if (!vehicle.id) return;
 
-  const confirmed = await new Promise<boolean>((resolve) => {
-    Notify.create({
-      type: 'negative',
-      message: 'Tem certeza que deseja excluir este veículo?',
-      actions: [
-        { label: 'Cancelar', color: 'white', handler: () => resolve(false) },
-        { label: 'Excluir', color: 'negative', handler: () => resolve(true) },
-      ],
-    });
+  Dialog.create({
+    title: 'Excluir veículo',
+    message: `Tem certeza que deseja excluir ${vehicle.brand} ${vehicle.model}?`,
+    cancel: { label: 'Cancelar', flat: true },
+    ok: { label: 'Excluir', color: 'negative' },
+    persistent: true,
+  }).onOk(() => {
+    vehiclesStore
+      .deleteVehicle(vehicle.id!)
+      .then(() => Notify.create({ type: 'positive', message: 'Veículo excluído com sucesso' }))
+      .catch((error) => {
+        console.error('Error deleting vehicle:', error);
+        Notify.create({ type: 'negative', message: 'Erro ao excluir veículo' });
+      });
   });
-
-  if (confirmed) {
-    try {
-      await vehiclesStore.deleteVehicle(vehicle.id);
-      Notify.create({ type: 'positive', message: 'Veículo excluído com sucesso' });
-    } catch (error) {
-      console.error('Error deleting vehicle:', error);
-      Notify.create({ type: 'negative', message: 'Erro ao excluir veículo' });
-    }
-  }
 };
 </script>
 
@@ -129,7 +126,9 @@ const deleteVehicle = async (vehicle: Vehicle) => {
               <template v-if="suppliesStore.vehicleLastConsumptions[vehicle.id!] !== undefined">
                 <span style="opacity: 0.4">·</span>
                 <q-icon name="local_gas_station" size="13px" style="opacity: 0.65" />
-                <span>{{ suppliesStore.vehicleLastConsumptions[vehicle.id!]!.toFixed(1) }} km/L</span>
+                <span
+                  >{{ suppliesStore.vehicleLastConsumptions[vehicle.id!]!.toFixed(1) }} km/L</span
+                >
               </template>
             </div>
             <q-icon name="arrow_forward" size="16px" style="opacity: 0.4" />

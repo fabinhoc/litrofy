@@ -6,6 +6,7 @@ import { useSuppliesStore } from 'stores/supplies';
 import { Notify } from 'quasar';
 import GlassCard from 'components/GlassCard.vue';
 import GlassButton from 'components/GlassButton.vue';
+import CurrencyInput from 'components/CurrencyInput.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -24,7 +25,7 @@ const vehicle = ref<Vehicle | null>(null);
 const form = reactive({
   mileage: 0,
   qtd: 0,
-  fuel: 'gasolina',
+  fuel: 'etanol',
   total: undefined as number | undefined,
   price_per_liter: undefined as number | undefined,
 });
@@ -75,17 +76,26 @@ const save = async () => {
     const next = idx !== -1 && idx < sorted.length - 1 ? sorted[idx + 1] : null;
 
     if (prev && form.mileage <= prev.mileage) {
-      Notify.create({ type: 'negative', message: 'Quilometragem deve ser maior que o abastecimento anterior' });
+      Notify.create({
+        type: 'negative',
+        message: 'Quilometragem deve ser maior que o abastecimento anterior',
+      });
       return;
     }
     if (next && form.mileage >= next.mileage) {
-      Notify.create({ type: 'negative', message: 'Quilometragem deve ser menor que o próximo abastecimento' });
+      Notify.create({
+        type: 'negative',
+        message: 'Quilometragem deve ser menor que o próximo abastecimento',
+      });
       return;
     }
   } else if (sorted.length > 0) {
     const lastMileage = sorted[sorted.length - 1]!.mileage;
     if (form.mileage <= lastMileage) {
-      Notify.create({ type: 'negative', message: 'Quilometragem deve ser maior que o último abastecimento' });
+      Notify.create({
+        type: 'negative',
+        message: 'Quilometragem deve ser maior que o último abastecimento',
+      });
       return;
     }
   }
@@ -139,51 +149,78 @@ const save = async () => {
     <glass-card>
       <q-card-section class="q-pa-lg">
         <q-form @submit="save" class="q-gutter-md">
-          <q-input
-            v-model.number="form.mileage"
+          <q-field
             label="Quilometragem *"
-            type="number"
-            required
             outlined
+            stack-label
             class="glass-input"
-            :rules="[(val) => val > 0 || 'Quilometragem deve ser maior que 0']"
-          />
-          <q-input
-            v-model.number="form.qtd"
+            :model-value="form.mileage || undefined"
+            :rules="[(val) => !!val || 'Quilometragem deve ser maior que 0']"
+          >
+            <template #control>
+              <currency-input
+                v-model="form.mileage"
+                prefix=""
+                :precision="0"
+                class="q-field__input"
+              />
+            </template>
+          </q-field>
+          <q-field
             label="Litros Abastecidos *"
-            type="number"
-            step="0.01"
-            required
             outlined
+            stack-label
             class="glass-input"
-            :rules="[(val) => val > 0 || 'Quantidade deve ser maior que 0']"
-          />
+            :model-value="form.qtd || undefined"
+            :rules="[(val) => !!val || 'Quantidade deve ser maior que 0']"
+          >
+            <template #control>
+              <currency-input
+                v-model="form.qtd"
+                prefix=""
+                :precision="2"
+                class="q-field__input"
+              />
+            </template>
+          </q-field>
           <q-select
             v-model="form.fuel"
-            :options="['gasolina', 'etanol', 'diesel']"
+            :options="['etanol', 'diesel', 'gasolina']"
             label="Combustível *"
             required
             outlined
             class="glass-input"
           />
-          <q-input
-            v-model.number="form.total"
+          <q-field
             label="Valor Total (R$)"
-            type="number"
-            step="0.01"
             outlined
+            stack-label
             class="glass-input"
-            @update:model-value="calculatePricePerLiter"
-          />
-          <q-input
-            v-model.number="form.price_per_liter"
+            :model-value="form.total"
+          >
+            <template #control>
+              <currency-input
+                v-model="form.total"
+                class="q-field__input"
+                @blur="calculatePricePerLiter"
+              />
+            </template>
+          </q-field>
+          <q-field
             label="Preço por Litro (R$)"
-            type="number"
-            step="0.01"
             outlined
+            stack-label
             class="glass-input"
-            @update:model-value="calculateTotal"
-          />
+            :model-value="form.price_per_liter"
+          >
+            <template #control>
+              <currency-input
+                v-model="form.price_per_liter"
+                class="q-field__input"
+                @blur="calculateTotal"
+              />
+            </template>
+          </q-field>
 
           <div class="row q-gutter-sm q-pt-sm">
             <glass-button variant="ghost" @click="$router.push(`/vehicle/${vehicleId}`)">

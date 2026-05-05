@@ -191,7 +191,7 @@ import { onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useVehiclesStore } from 'stores/vehicles';
 import { useSuppliesStore, type FuelSupply } from 'stores/supplies';
-import { Notify } from 'quasar';
+import { Notify, Dialog } from 'quasar';
 import GlassCard from 'components/GlassCard.vue';
 import GlassButton from 'components/GlassButton.vue';
 import MetricCard from 'components/MetricCard.vue';
@@ -213,29 +213,24 @@ onMounted(async () => {
   }
 });
 
-const deleteSupply = async (supply: FuelSupply) => {
+const deleteSupply = (supply: FuelSupply) => {
   if (!supply.id) return;
 
-  const confirmed = await new Promise<boolean>((resolve) => {
-    Notify.create({
-      type: 'negative',
-      message: 'Tem certeza que deseja excluir este abastecimento?',
-      actions: [
-        { label: 'Cancelar', color: 'white', handler: () => resolve(false) },
-        { label: 'Excluir', color: 'negative', handler: () => resolve(true) },
-      ],
-    });
+  Dialog.create({
+    title: 'Excluir abastecimento',
+    message: 'Tem certeza que deseja excluir este abastecimento?',
+    cancel: { label: 'Cancelar', flat: true },
+    ok: { label: 'Excluir', color: 'negative' },
+    persistent: true,
+  }).onOk(() => {
+    suppliesStore
+      .deleteSupply(supply.id!)
+      .then(() => Notify.create({ type: 'positive', message: 'Abastecimento excluído com sucesso' }))
+      .catch((error) => {
+        console.error('Error deleting supply:', error);
+        Notify.create({ type: 'negative', message: 'Erro ao excluir abastecimento' });
+      });
   });
-
-  if (confirmed) {
-    try {
-      await suppliesStore.deleteSupply(supply.id);
-      Notify.create({ type: 'positive', message: 'Abastecimento excluído com sucesso' });
-    } catch (error) {
-      console.error('Error deleting supply:', error);
-      Notify.create({ type: 'negative', message: 'Erro ao excluir abastecimento' });
-    }
-  }
 };
 </script>
 
